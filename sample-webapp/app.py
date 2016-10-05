@@ -17,6 +17,15 @@
 
 import webapp2
 
+import logging as std_logging
+
+std_logging.basicConfig()
+
+custom_formatter = std_logging.Formatter('%(created)f\t%(message)s')
+custom_handler = std_logging.FileHandler('/var/log/app_engine/custom_logs/custom.log')
+custom_handler.setFormatter(custom_formatter)
+custom_logging = std_logging.getLogger('custom')
+custom_logging.addHandler(custom_handler)
 
 class HomeHandler(webapp2.RequestHandler):
     def get(self):
@@ -29,6 +38,7 @@ class LoginHandler(webapp2.RequestHandler):
         deviceid = self.request.get('deviceid')
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.write('/login - device: {}\n'.format(deviceid))
+        custom_logging.info('/login - device: {}'.format(deviceid))
 
 
 class MetricsHandler(webapp2.RequestHandler):
@@ -38,6 +48,7 @@ class MetricsHandler(webapp2.RequestHandler):
         
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.write('/metrics - device: {}, timestamp: {}\n'.format(deviceid, timestamp))
+        custom_logging.info('/metrics - device: {}, timestamp: {}'.format(deviceid, timestamp))
 
 
 app = webapp2.WSGIApplication([
